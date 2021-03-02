@@ -9,8 +9,9 @@ API_BASE = 'https://eagreconnect.converve.io/api/v1/'
 app = Flask(__name__)
 
 
-@app.route('/')
-def catch_all():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
     user_id = request.args.get('user_id')
     user_hash = request.args.get('user_hash')
     stats_data = converve_get(f'persinfo/{user_id}/{user_hash}')
