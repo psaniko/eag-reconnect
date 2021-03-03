@@ -1,10 +1,15 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 import requests
 
 
+GOALS = {  # level: (meetings, sessions)
+    1: (5, 1),
+    2: (10, 2),
+    3: (15, 3),
+}
 API_BASE = 'https://eagreconnect.converve.io/api/v1/'
 app = Flask(__name__)
 
@@ -12,17 +17,19 @@ app = Flask(__name__)
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
+    # get basic data
     user_id = request.args.get('user_id')
     user_hash = request.args.get('user_hash')
+    if not user_id or not user_hash:
+        return ''
     stats_data = converve_get(f'persinfo/{user_id}/{user_hash}')
     if not stats_data:
         return {}
-
     stats_data = stats_data.json()
 
-    # get goal meetings and sessions
-    goal_meetings = 10  # TODO
-    goal_sessions = 2  # TODO
+    # set goal meetings and sessions
+    goal_level = int(stats_data['goal_package'])
+    goal_meetings, goal_sessions = GOALS[goal_level]
 
     # count current meetings and sessions
     meetings_scheduled = len(stats_data.get('meetings', []))
@@ -32,15 +39,14 @@ def catch_all(path):
         if datetime.now() > datetime.strptime(session['utc_datetime_end'], '%Y-%m-%d %H:%M:%S')
     ])
 
-    return {
-        'status': 200,
-        'data': {
-            'goal_meetings': goal_meetings,
-            'goal_sessions': goal_sessions,
-            'meetings_scheduled': meetings_scheduled,
-            'sessions_attended': sessions_attended,
-        },
-    }
+    return render_template(
+        'index.html',
+        goal_meetings=goal_meetings,
+        goal_sessions=goal_sessions,
+        meetings_scheduled=meetings_scheduled,
+        sessions_attended=sessions_attended,
+        session_percent=min(goal_sessions, sessions_attended) / goal_sessions * 100,
+    )
 
 
 def converve_get(path):

@@ -1,0 +1,111 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>EAG widget</title>
+    <meta name="eag-reconnect widget" content="eag-reconnect widget">
+    <meta name="viewport" content="width=device-width, heigth=device-height, initial-scale=1.0">
+    <link rel="icon" href="data:;base64,=">
+
+    <style>
+        body {
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .outer_box {
+            width: 100%;
+            height: 100%;
+            margin: 5px;
+            padding: 15px;
+            border: 2px solid black;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .progressbar-outer {
+            display: flex;
+            position: relative;
+            height: 30px;
+            width: 100%;
+            border: 2px solid black;
+        }
+
+        .progressbar-inner {
+            display: flex;
+            position: absolute;
+            background-color: lightgrey;
+            height: 100%;
+        }
+
+        #session-progress-value {
+            width: {{ session_percent }}%;
+        }
+
+        h3 {
+            margin: 15px 0;
+        }
+
+        .progressbar-text {
+            z-index: 1;
+            align-self: center;
+            margin-left: 5px;
+        }
+
+        #outside-meetings {
+            width: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="outer_box">
+
+        <h3>Meeting Progress</h3>
+        <div class="progressbar-outer">
+            <p class="progressbar-text">
+                <span id="actual-meetings">{{ meetings_scheduled }}</span>/<span id="goal-meetings">{{ goal_meetings }}</span> meetings scheduled
+            </p>
+            <div class="progressbar-inner" id="meeting-progress-value"></div>
+        </div>
+
+        <h3>Session Progress</h3>
+        <div class="progressbar-outer">
+            <p class="progressbar-text">{{ sessions_attended }}/{{ goal_sessions }} schedules attended</p>
+            <div class="progressbar-inner" id="session-progress-value"></div>
+        </div>
+        <br>
+        <div>
+            <input type="number" id="outside-meetings" min="0">
+            <label for="outside-meetings">Meetings scheduled outside Converve</label>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const goal_meetings = document.getElementById('goal-meetings').innerText;
+        const api_meetings = 2;
+        const ext_meetings = parseInt(localStorage.getItem('ext_meetings') || 0);
+        const ext_meetings_input = document.getElementById('outside-meetings');
+
+        setProgressbarMeetings(api_meetings + ext_meetings);
+        ext_meetings_input.value = ext_meetings;
+
+        ext_meetings_input.addEventListener('change', (event) => {
+            const ext_meetings = parseInt(event.target.value);
+            localStorage.setItem('ext_meetings', ext_meetings);
+            setProgressbarMeetings(api_meetings + ext_meetings);
+        });
+
+        function setProgressbarMeetings(num_meetings) {
+            document.getElementById('actual-meetings').innerHTML = num_meetings;
+            if (num_meetings > goal_meetings) {
+                num_meetings = goal_meetings;
+            }
+            document.getElementById('meeting-progress-value').style.width = (num_meetings / goal_meetings * 100).toString() + '%';
+        }
+    </script>
+</body>
+
+</html>
