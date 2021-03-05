@@ -42,6 +42,7 @@
 
         #session-progress-value {
             width: {{ session_percent }}%;
+            background-color: {{ session_background_color }};
         }
 
         h3 {
@@ -104,6 +105,11 @@
                 num_meetings = goal_meetings;
             }
             document.getElementById('meeting-progress-value').style.width = (num_meetings / goal_meetings * 100).toString() + '%';
+            if (num_meetings >= goal_meetings) {
+                document.getElementById('meeting-progress-value').style.backgroundColor = '#90ee90';
+            } else {
+                document.getElementById('meeting-progress-value').style.backgroundColor = 'lightgrey';
+            }
         }
     </script>
 </body>

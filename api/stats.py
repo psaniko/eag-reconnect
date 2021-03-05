@@ -46,6 +46,7 @@ def catch_all(path):
         meetings_scheduled=meetings_scheduled,
         sessions_attended=sessions_attended,
         session_percent=min(goal_sessions, sessions_attended) / goal_sessions * 100,
+        session_background_color='#90ee90' if sessions_attended >= goal_sessions else 'lightgrey',
     )
 
 
