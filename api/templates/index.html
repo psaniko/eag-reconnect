@@ -17,6 +17,7 @@
         }
         
         .outer_box {
+            position: relative;
             width: 100%;
             height: 100%;
             margin: 5px;
@@ -58,11 +59,19 @@
         #outside-meetings {
             width: 30px;
         }
+
+        .level-label {
+            position: absolute;
+            top: -8px;
+            background-color: white;
+            padding: 0 5px;
+        }
     </style>
 </head>
 
 <body>
     <div class="outer_box">
+        <div class="level-label">Level {{ level }}</div>
 
         <h3>Meeting Progress</h3>
         <div class="progressbar-outer">
